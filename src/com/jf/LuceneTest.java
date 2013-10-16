@@ -15,12 +15,14 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -35,8 +37,8 @@ public class LuceneTest {
 	    private String dataSourceFile = "test/data";
 	    private File indexFile=new File("test/index");
 	    //创建简单中文分析器  
-	    private Analyzer analyzer = new SmartChineseAnalyzer(Version.LUCENE_36,true);  
-	    private Analyzer analyzer2 = new StandardAnalyzer(Version.LUCENE_36);
+	    private Analyzer analyzer = new SmartChineseAnalyzer(Version.LUCENE_45,true);  
+	    private Analyzer analyzer2 = new StandardAnalyzer(Version.LUCENE_45);
 	    private Analyzer analyzer3 = new IKAnalyzer(true);
 	    
 	    private String[] fields={"title","content"};  
@@ -50,7 +52,7 @@ public class LuceneTest {
 	        //创建索引目录  
 	        Directory directory = FSDirectory.open(indexFile);  
 	        //建立索引创建类  
-	        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_36, analyzer2);  
+	        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_45, analyzer2);  
 	        indexWriterConfig.setOpenMode(IndexWriterConfig.OpenMode.CREATE);  //总是重新创建索引
 	        IndexWriter writer = new IndexWriter(directory, indexWriterConfig);  
 	  
@@ -61,8 +63,11 @@ public class LuceneTest {
 	            for (int i = 0; i < files.length; i++) {  
 	                Document document = new Document();
 	                //document.add(new Field("content", new FileReader(files[i])));  
-	                document.add(new Field("content", getContent(files[i]), Field.Store.YES, Field.Index.ANALYZED));  
-	                document.add(new Field("title", files[i].getName(), Field.Store.YES, Field.Index.ANALYZED));  
+	                FieldType fieldType = new FieldType();
+	                fieldType.setIndexed(true);
+	                fieldType.setStored(true);
+	                document.add(new Field("content", getContent(files[i]), fieldType));  
+	                document.add(new Field("title", files[i].getName(), fieldType));  
 	                writer.addDocument(document);  
 	            }  
 	            long time2 = System.currentTimeMillis();  
@@ -81,10 +86,10 @@ public class LuceneTest {
 	    @Test  
 	    public void search() throws IOException, ParseException {  
 	  
-	        IndexReader indexReader = IndexReader.open(FSDirectory.open(indexFile));  
+	        IndexReader indexReader = DirectoryReader.open(FSDirectory.open(indexFile));  
 	        //创建搜索类  
 	        IndexSearcher indexSearcher = new IndexSearcher(indexReader);  
-	        QueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_36, fields, analyzer);  
+	        QueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_45, fields, analyzer);  
 	        Query query = queryParser.parse("中国人");  
 	        TopDocs topDocs = indexSearcher.search(query, 10000);  
 	        System.out.println("一共查到:" + topDocs.totalHits + "记录");  
@@ -102,17 +107,15 @@ public class LuceneTest {
 
 	    @Test  
 	    public void analyzerIndex() throws Exception {  
-	    	Analyzer a = analyzer3; 
+	    	Analyzer a = analyzer; 
 	    	String s ="我们是中国人";  
 //	    	String s ="this is test file for lucene";  
 	        StringReader reader = new StringReader(s);  
 	        TokenStream ts = a.tokenStream("", reader);  
 	        String s1 = "", s2 = "";  
-	        //boolean hasnext= ts.incrementToken();  
-	        //Token t = ts.next();  
+	        
 	        while (ts.incrementToken()) {  
 	            CharTermAttribute ta = ts.getAttribute(CharTermAttribute.class);  
-	              
 	            s2 = ta.toString() + "/";  
 	            s1 += s2;  
 	        }  
