@@ -3,6 +3,8 @@ package com.jf;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.MultiFieldQueryParser;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
@@ -12,6 +14,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 import org.junit.Test;
 
 
@@ -33,13 +36,31 @@ public class QueryTest extends LuceneBase{
             //根据文档id找到文档  
             Document doc = indexSearcher.doc(docId); 
             System.out.println("title:" + doc.get("title"));  
-            System.out.println("content:" + doc.get("content"));  
+            System.out.println("content:" + doc.get("content"));
+            System.out.println("query: "+query);
         }  
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * 使用查询语句查询
+	 * 可以用query rewrite，实现信息过滤
+	 */
+	@Test
+	public void testQueryString() {
+		
+		try {
+			QueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_36, fields, standardAnalyzer);
+//			Query query = queryParser.parse("content:test -title:test");
+			Query query = queryParser.parse("test -file");
+			queryAndPrintResult(query);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * 关键词查询
 	 * title:test

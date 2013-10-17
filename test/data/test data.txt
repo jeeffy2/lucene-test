@@ -1,2 +1,2 @@
-this is file for lucene
+this is test file for lucene
 我们是中国人

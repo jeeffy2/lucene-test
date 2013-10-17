@@ -43,7 +43,6 @@ public class IndexTest extends LuceneBase{
 	        //建立索引  
 	        File[] files = new File(dataDirectory).listFiles();  
 	        if (files.length > 0) {  
-	            long time1 = System.currentTimeMillis();  
 	            for (int i = 0; i < files.length; i++) {  
 	                Document document = new Document();
 	                //document.add(new Field("content", new FileReader(files[i])));  
@@ -51,11 +50,8 @@ public class IndexTest extends LuceneBase{
 	                document.add(new Field("title", files[i].getName(), Field.Store.YES, Field.Index.ANALYZED));  
 	                writer.addDocument(document);  
 	            }  
-	            long time2 = System.currentTimeMillis();  
 	            System.out.println("创建了" + writer.numDocs() + "索引");  
-	            System.out.println("一共花了" + (time2 - time1) + "时间");  
 	        }  
-	  
 	        writer.close();  
 	    }  
 	  
