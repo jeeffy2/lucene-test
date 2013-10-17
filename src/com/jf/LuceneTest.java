@@ -34,7 +34,7 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 public class LuceneTest {
 	    private String dataSourceFile = "test/data";
 	    private File indexFile=new File("test/index");
-	    //´´½¨¼òµ¥ÖĞÎÄ·ÖÎöÆ÷  
+	    //åˆ›å»ºç®€å•ä¸­æ–‡åˆ†æå™¨  
 	    private Analyzer analyzer = new SmartChineseAnalyzer(Version.LUCENE_36,true);  
 	    private Analyzer analyzer2 = new StandardAnalyzer(Version.LUCENE_36);
 	    private Analyzer analyzer3 = new IKAnalyzer(true);
@@ -42,19 +42,19 @@ public class LuceneTest {
 	    private String[] fields={"title","content"};  
 	   
 	    /** 
-	     * ´´½¨Ë÷Òı 
+	     * åˆ›å»ºç´¢å¼• 
 	     * @throws IOException 
 	     */  
 	    @Test  
 	    public void createIndex() throws IOException {  
-	        //´´½¨Ë÷ÒıÄ¿Â¼  
+	        //åˆ›å»ºç´¢å¼•ç›®å½•  
 	        Directory directory = FSDirectory.open(indexFile);  
-	        //½¨Á¢Ë÷Òı´´½¨Àà  
+	        //å»ºç«‹ç´¢å¼•åˆ›å»ºç±»  
 	        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_36, analyzer2);  
-	        indexWriterConfig.setOpenMode(IndexWriterConfig.OpenMode.CREATE);  //×ÜÊÇÖØĞÂ´´½¨Ë÷Òı
+	        indexWriterConfig.setOpenMode(IndexWriterConfig.OpenMode.CREATE);  //æ€»æ˜¯é‡æ–°åˆ›å»ºç´¢å¼•
 	        IndexWriter writer = new IndexWriter(directory, indexWriterConfig);  
 	  
-	        //½¨Á¢Ë÷Òı  
+	        //å»ºç«‹ç´¢å¼•  
 	        File[] files = new File(dataSourceFile).listFiles();  
 	        if (files.length > 0) {  
 	            long time1 = System.currentTimeMillis();  
@@ -66,15 +66,15 @@ public class LuceneTest {
 	                writer.addDocument(document);  
 	            }  
 	            long time2 = System.currentTimeMillis();  
-	            System.out.println("´´½¨ÁË" + writer.numDocs() + "Ë÷Òı");  
-	            System.out.println("Ò»¹²»¨ÁË" + (time2 - time1) + "Ê±¼ä");  
+	            System.out.println("åˆ›å»ºäº†" + writer.numDocs() + "ç´¢å¼•");  
+	            System.out.println("ä¸€å…±èŠ±äº†" + (time2 - time1) + "æ—¶é—´");  
 	        }  
 	  
 	        writer.close();  
 	    }  
 	  
 	    /** 
-	     * ËÑË÷ÎÄµµ 
+	     * æœç´¢æ–‡æ¡£ 
 	     * @throws IOException 
 	     * @throws ParseException 
 	     */  
@@ -82,19 +82,19 @@ public class LuceneTest {
 	    public void search() throws IOException, ParseException {  
 	  
 	        IndexReader indexReader = IndexReader.open(FSDirectory.open(indexFile));  
-	        //´´½¨ËÑË÷Àà  
+	        //åˆ›å»ºæœç´¢ç±»  
 	        IndexSearcher indexSearcher = new IndexSearcher(indexReader);  
 	        QueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_36, fields, analyzer);  
-	        Query query = queryParser.parse("ÖĞ¹úÈË");  
+	        Query query = queryParser.parse("ä¸­å›½äºº");  
 	        TopDocs topDocs = indexSearcher.search(query, 10000);  
-	        System.out.println("Ò»¹²²éµ½:" + topDocs.totalHits + "¼ÇÂ¼");  
+	        System.out.println("ä¸€å…±æŸ¥åˆ°:" + topDocs.totalHits + "è®°å½•");  
 	        ScoreDoc[] scoreDoc = topDocs.scoreDocs;  
 	  
 	        for (int i = 0; i < scoreDoc.length; i++) {  
-	            //ÄÚ²¿±àºÅ  
+	            //å†…éƒ¨ç¼–å·  
 	            int doc = scoreDoc[i].doc;  
 	            System.out.println("doc:" + doc);  
-	            //¸ù¾İÎÄµµidÕÒµ½ÎÄµµ  
+	            //æ ¹æ®æ–‡æ¡£idæ‰¾åˆ°æ–‡æ¡£  
 	            Document mydoc = indexSearcher.doc(doc); 
 	            System.out.println("content:" + mydoc.get("content"));  
 	        }  
@@ -103,7 +103,7 @@ public class LuceneTest {
 	    @Test  
 	    public void analyzerIndex() throws Exception {  
 	    	Analyzer a = analyzer3; 
-	    	String s ="ÎÒÃÇÊÇÖĞ¹úÈË";  
+	    	String s ="æˆ‘ä»¬æ˜¯ä¸­å›½äºº";  
 //	    	String s ="this is test file for lucene";  
 	        StringReader reader = new StringReader(s);  
 	        TokenStream ts = a.tokenStream("", reader);  
